@@ -28,6 +28,7 @@ export default function Header() {
 
                 <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
                     <Nav.Link href="/">Create Post</Nav.Link>
+                    <Nav.Link href="/post">Posts</Nav.Link>
                     <Nav.Link href="/category">Categories</Nav.Link>
                     <Button variant="secondary" onClick={handleLogout}>Logout</Button>
                 </Navbar.Collapse>

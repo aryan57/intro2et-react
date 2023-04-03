@@ -69,6 +69,25 @@ export const AuthProvider = ({ children }) => {
 		}
 	}
 
+	const getPosts = async () => {
+		try {
+			const response = await axios.get(`${API_URL}/post/allPosts`);
+			if (response.status !== 200) {
+				return { error: true, message: response.data }
+			}
+
+			if (response.data.success !== true) {
+				return { error: true, message: response.data.message }
+			}
+
+			return response.data.list
+
+		} catch (err) {
+			await refresh()
+			return { error: true, message: JSON.stringify([err.message, "We have refreshed the token also, can you try again?"]) }
+		}
+	}
+
 	const getCategories = async () => {
 		try {
 			const str = localStorage.getItem('categoryMapping_idToNameMap')
@@ -292,6 +311,7 @@ export const AuthProvider = ({ children }) => {
 		updateCategoryMappings,
 		createCategory,
 		getCategories,
+		getPosts,
 		authState
 	}
 
