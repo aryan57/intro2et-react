@@ -1,19 +1,24 @@
 import React, { useState, useRef } from "react"
-import Header from '../Widgets/Header'
+import Header from '../Utilities/Header'
 import { Container, Table, ProgressBar, Form, Button, Alert, FormControl, InputGroup } from 'react-bootstrap'
 import { useAuth } from "../contexts/AuthContext"
 
-export default function Grid() {
+export default function Dashboard() {
 
-  const [uploadProgress, setUploadProgress] = useState(0)
-  const [file, setFile] = useState('')
+  const [file, setFile] = useState(null)
+  const [imgPublicUrl, setImgPublicUrl] = useState(null)
+  const [predictionList, setPredictionList] = useState(null)
+  const [categoryName, setCategoryName] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
-  const captionRef = useRef()
+  const descriptionRef = useRef()
 
-  const { createPost
-  } = useAuth()
+  const { createPost, whoami, uploadPostImage, predict, updateCategoryMappings } = useAuth()
+
+  const handleCategoryChange = (event) => {
+    setCategoryName(event.target.value)
+  }
 
   async function uploadNewPost_() {
 
@@ -30,12 +35,35 @@ export default function Grid() {
     setLoading(true)
     setSuccess("")
     setError("")
-    setUploadProgress(0);
+    setImgPublicUrl(null)
+    setPredictionList(null)
+    setCategoryName(null)
 
-    // todo upload image in bucket
+    try {
+
+
+      const public_url = await uploadPostImage(file);
+      if (public_url && public_url.error)throw public_url
+
+      setImgPublicUrl(public_url)
+      setSuccess("Image Upload Successfull!")
+
+      const prediction_list = await predict(file);
+      if (prediction_list && prediction_list.error)throw prediction_list
+
+      setPredictionList(prediction_list)
+      setCategoryName(prediction_list[0])
+      setSuccess("Predictions accquired!")
+      
+
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+      descriptionRef.current.value = ""
+    }
 
   }
-
 
   return (
     <>
@@ -49,11 +77,31 @@ export default function Grid() {
 
           <Table striped bordered hover responsive style={{ marginTop: 10 }}>
             <tbody>
-              <tr>
+              {
+                predictionList && 
+                <tr>
                 <td>
-                  <ProgressBar animated now={uploadProgress} label={`${uploadProgress}%`} />
+                  <Form>
+                    
+                      <div key={`inline-checkbox`} className="">
+                      {predictionList.map((predictionCategory) => (
+                        <Form.Check
+                          label={predictionCategory}
+                          value={predictionCategory}
+                          name="group1"
+                          type="radio"
+                          id={`inline-checkbox-${predictionCategory}`}
+                          checked={categoryName===predictionCategory}
+                          onChange={handleCategoryChange}
+                        />
+                      ))}
+                      </div>
+                    
+                  </Form>
                 </td>
               </tr>
+              }
+              
               <tr>
                 <td>
                   <Form>
@@ -69,7 +117,7 @@ export default function Grid() {
               <tr>
                 <td>
                   <InputGroup>
-                    <FormControl ref={captionRef} placeholder="Description (Optional)" />
+                    <FormControl ref={descriptionRef} placeholder="Description (Optional)" />
                   </InputGroup>
                 </td>
               </tr>

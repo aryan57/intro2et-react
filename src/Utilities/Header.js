@@ -1,11 +1,11 @@
 import React, { useState } from "react"
-import { Button, Navbar, Nav, Alert } from "react-bootstrap"
+import { Button, Navbar, Alert } from "react-bootstrap"
 import { useAuth } from "../contexts/AuthContext"
 import { useHistory } from "react-router-dom"
 
 export default function Header() {
     const [error, setError] = useState("")
-    const { logout } = useAuth()
+    const { logout,authState } = useAuth()
     const history = useHistory()
 
     async function handleLogout() {
@@ -23,7 +23,7 @@ export default function Header() {
         <>
             {error && <Alert variant="danger">{error}</Alert>}
             <Navbar bg="dark" variant="dark" expand="lg">
-                <Navbar.Brand href="/">Dashboard</Navbar.Brand>
+                {authState.userEmail && <Navbar.Brand href="/">Welcome, {authState.userEmail}</Navbar.Brand>}
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Button variant="secondary" onClick={handleLogout}>Logout</Button>
