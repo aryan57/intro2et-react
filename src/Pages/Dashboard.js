@@ -65,6 +65,9 @@ export default function Dashboard() {
 
     } catch (err) {
       setError(err.message)
+      setImgPublicUrl(null)
+      setPredictionList(null)
+      setCategoryName(null)
     } finally {
       setLoading(false)
     }
@@ -129,13 +132,14 @@ export default function Dashboard() {
             <tbody>
               {
                 predictionList &&
-                <tr>
-                  <td>
+                <tr >
+                  <td colSpan={2}>
                     <Form>
 
-                      <div key={`inline-checkbox`} className="">
+                      <div key={`inline-checkbox`} className="" style={{ height: '100px',overflowY: 'scroll' }}>
                         {predictionList.map((predictionCategory) => (
                           <Form.Check
+                      
                             label={predictionCategory}
                             value={predictionCategory}
                             key={predictionCategory}
@@ -164,23 +168,21 @@ export default function Dashboard() {
                     />
                   </Form>
                 </td>
-              </tr>
-              <tr>
                 <td>
-                  <InputGroup>
-                    <FormControl ref={descriptionRef} placeholder="Description (Optional)" />
-                  </InputGroup>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <Button disabled={loading} className="w-100" onClick={uploadImageAndGetData}>
-                    Upload Image
+                  <Button disabled={loading} className="w-10" onClick={uploadImageAndGetData}>
+                    Upload
                   </Button>
                 </td>
               </tr>
               <tr>
-                <td>
+                <td colSpan={2}  >
+                  <InputGroup >
+                    <FormControl type="text" ref={descriptionRef}  placeholder="Description (Optional)" />
+                  </InputGroup>
+                </td>
+              </tr>
+              <tr>
+                <td colSpan={2}>
                 <Button disabled={loading} className="w-100" onClick={uploadNewPost}>
                   Add New Post
                 </Button>

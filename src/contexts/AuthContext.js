@@ -55,17 +55,33 @@ export const AuthProvider = ({ children }) => {
 			let nameToIdMap = {}
 			let idToNameMap = {}
 			let arr = response.data.list
-			for(let i=0;i<arr.length;i++){
+			for (let i = 0; i < arr.length; i++) {
 				nameToIdMap[arr[i]['categoryName']] = arr[i]['id']
 				idToNameMap[arr[i]['id']] = arr[i]['categoryName']
 			}
-			localStorage.setItem('categoryMapping_nameToIdMap',JSON.stringify(nameToIdMap))
-			localStorage.setItem('categoryMapping_idToNameMap',JSON.stringify(idToNameMap))
+			localStorage.setItem('categoryMapping_nameToIdMap', JSON.stringify(nameToIdMap))
+			localStorage.setItem('categoryMapping_idToNameMap', JSON.stringify(idToNameMap))
 			return response
 
 		} catch (err) {
 			await refresh()
 			return { error: true, message: JSON.stringify([err.message, "We have refreshed the token also, can you try again?"]) }
+		}
+	}
+
+	const getCategories = async () => {
+		try {
+			const str = localStorage.getItem('categoryMapping_idToNameMap')
+			if(!str)return { error: true, message: 'categoryMapping_idToNameMap not found in local storage' }
+			const map = new Map(Object.entries(JSON.parse(str)));
+			if(!map)return { error: true, message: 'error in parsing the list' }
+			let lst = []
+			for (const entry of map.entries()) {
+				lst.push(entry[1]);
+			}
+			return lst
+		} catch (err) {
+			return { error: true, message: err.message }
 		}
 	}
 
@@ -105,7 +121,7 @@ export const AuthProvider = ({ children }) => {
 			const refreshToken = localStorage.getItem('refreshToken')
 			const userEmail = localStorage.getItem('userEmail')
 
-			if (!refreshToken || !userEmail) throw {error:true,message:"refresh token not found"}
+			if (!refreshToken || !userEmail) throw { error: true, message: "refresh token not found" }
 
 			axios.defaults.headers.common['Authorization'] = `Bearer ${refreshToken}`
 
@@ -162,7 +178,7 @@ export const AuthProvider = ({ children }) => {
 
 	const uploadPostImage = async (img) => {
 		try {
-			var formdata = new FormData();
+			let formdata = new FormData();
 			formdata.append("file", img, img.name);
 
 			const response = await axios.post(`${API_URL}/post/uploadPostImage`, formdata);
@@ -185,7 +201,7 @@ export const AuthProvider = ({ children }) => {
 
 	const predict = async (img) => {
 		try {
-			var formdata = new FormData();
+			let formdata = new FormData();
 			formdata.append("file", img, img.name);
 
 			const response = await axios.post(`${API_URL}/predict/predict`, formdata);
@@ -242,6 +258,27 @@ export const AuthProvider = ({ children }) => {
 		}
 	}
 
+	const createCategory = async (categoryName) => {
+		try {
+
+			const response = await axios.post(`${API_URL}/category/createCategory`, { categoryName });
+
+			if (response.status !== 200) {
+				return { error: true, message: response.data }
+			}
+
+			if (response.data.success !== true) {
+				return { error: true, message: response.data.message }
+			}
+
+			return response.data.message;
+
+		} catch (err) {
+			await refresh()
+			return { error: true, message: JSON.stringify([err.message, "We have refreshed the token also, can you try again?"]) }
+		}
+	}
+
 
 
 	const value = {
@@ -253,6 +290,8 @@ export const AuthProvider = ({ children }) => {
 		uploadPostImage,
 		predict,
 		updateCategoryMappings,
+		createCategory,
+		getCategories,
 		authState
 	}
 
