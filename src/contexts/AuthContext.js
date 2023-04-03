@@ -3,8 +3,8 @@ import axios from 'axios';
 
 
 const AuthContext = createContext();
-// export const API_URL = 'https://btp-backend-flask-inpm4aannq-el.a.run.app/api/v1'
-export const API_URL = 'http://localhost:8080/api/v1'
+export const API_URL = 'https://btp-backend-flask-inpm4aannq-el.a.run.app/api/v1'
+// export const API_URL = 'http://localhost:8080/api/v1'
 
 export const useAuth = () => {
 	return useContext(AuthContext)
@@ -105,7 +105,7 @@ export const AuthProvider = ({ children }) => {
 			const refreshToken = localStorage.getItem('refreshToken')
 			const userEmail = localStorage.getItem('userEmail')
 
-			if (!refreshToken || !userEmail) throw "refresh token not found"
+			if (!refreshToken || !userEmail) throw {error:true,message:"refresh token not found"}
 
 			axios.defaults.headers.common['Authorization'] = `Bearer ${refreshToken}`
 
@@ -152,7 +152,7 @@ export const AuthProvider = ({ children }) => {
 				return { error: true, message: response.data.message }
 			}
 
-			return response;
+			return response.data.message;
 
 		} catch (err) {
 			await refresh()

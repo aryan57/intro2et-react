@@ -1,7 +1,8 @@
 import React, { useState, useRef } from "react"
 import Header from '../Utilities/Header'
-import { Container, Table, ProgressBar, Form, Button, Alert, FormControl, InputGroup } from 'react-bootstrap'
+import { Container, Table, Form, Button, Alert, FormControl, InputGroup } from 'react-bootstrap'
 import { useAuth } from "../contexts/AuthContext"
+import { useGeolocated } from "react-geolocated";
 
 export default function Dashboard() {
 
@@ -13,6 +14,13 @@ export default function Dashboard() {
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
   const descriptionRef = useRef()
+  const { coords, isGeolocationAvailable, isGeolocationEnabled } =
+    useGeolocated({
+      positionOptions: {
+        enableHighAccuracy: true,
+      },
+      userDecisionTimeout: 5000,
+    });
 
   const { createPost, whoami, uploadPostImage, predict, updateCategoryMappings } = useAuth()
 
@@ -20,7 +28,7 @@ export default function Dashboard() {
     setCategoryName(event.target.value)
   }
 
-  async function uploadNewPost_() {
+  async function uploadImageAndGetData() {
 
     if (!file || file.type.lastIndexOf('/') < 0) {
       setError("Please select a valid image")
@@ -43,26 +51,68 @@ export default function Dashboard() {
 
 
       const public_url = await uploadPostImage(file);
-      if (public_url && public_url.error)throw public_url
+      if (public_url && public_url.error) throw public_url
 
       setImgPublicUrl(public_url)
       setSuccess("Image Upload Successfull!")
 
       const prediction_list = await predict(file);
-      if (prediction_list && prediction_list.error)throw prediction_list
+      if (prediction_list && prediction_list.error) throw prediction_list
 
       setPredictionList(prediction_list)
       setCategoryName(prediction_list[0])
       setSuccess("Predictions accquired!")
-      
 
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+
+  }
+
+  async function uploadNewPost() {
+
+    if(!categoryName){
+      setError("Please upload an image first")
+      return
+    }
+
+    setLoading(true)
+    setSuccess("")
+    setError("")
+
+    try {
+
+
+      const nameToIdMap = JSON.parse(localStorage.getItem('categoryMapping_nameToIdMap'))
+      if (!nameToIdMap) throw { message: "Mapping not found" }
+      const categoryId = nameToIdMap[categoryName]
+      if (!categoryId) throw { message: `categoryId for ${categoryName} not found` }
+
+      let location = {
+        latitude: 0,
+        longitude: 0
+      };
+
+      if (isGeolocationAvailable && isGeolocationEnabled && coords) {
+        location = {
+          latitude: coords.latitude,
+          longitude: coords.longitude
+        }
+      }
+
+      const unixTime = Math.floor(Date.now() / 1000);
+
+      const result = await createPost(descriptionRef.current.value, imgPublicUrl, unixTime, location.longitude, location.latitude, categoryId)
+      if (result && result.error) throw result
+      setSuccess(result)
     } catch (err) {
       setError(err.message)
     } finally {
       setLoading(false)
       descriptionRef.current.value = ""
     }
-
   }
 
   return (
@@ -78,30 +128,31 @@ export default function Dashboard() {
           <Table striped bordered hover responsive style={{ marginTop: 10 }}>
             <tbody>
               {
-                predictionList && 
+                predictionList &&
                 <tr>
-                <td>
-                  <Form>
-                    
+                  <td>
+                    <Form>
+
                       <div key={`inline-checkbox`} className="">
-                      {predictionList.map((predictionCategory) => (
-                        <Form.Check
-                          label={predictionCategory}
-                          value={predictionCategory}
-                          name="group1"
-                          type="radio"
-                          id={`inline-checkbox-${predictionCategory}`}
-                          checked={categoryName===predictionCategory}
-                          onChange={handleCategoryChange}
-                        />
-                      ))}
+                        {predictionList.map((predictionCategory) => (
+                          <Form.Check
+                            label={predictionCategory}
+                            value={predictionCategory}
+                            key={predictionCategory}
+                            name="group1"
+                            type="radio"
+                            id={`inline-checkbox-${predictionCategory}`}
+                            checked={categoryName === predictionCategory}
+                            onChange={handleCategoryChange}
+                          />
+                        ))}
                       </div>
-                    
-                  </Form>
-                </td>
-              </tr>
+
+                    </Form>
+                  </td>
+                </tr>
               }
-              
+
               <tr>
                 <td>
                   <Form>
@@ -123,22 +174,29 @@ export default function Dashboard() {
               </tr>
               <tr>
                 <td>
-                  <Button disabled={loading} className="w-100" onClick={uploadNewPost_}>
-                    Add New Post
+                  <Button disabled={loading} className="w-100" onClick={uploadImageAndGetData}>
+                    Upload Image
                   </Button>
                 </td>
               </tr>
+              <tr>
+                <td>
+                <Button disabled={loading} className="w-100" onClick={uploadNewPost}>
+                  Add New Post
+                </Button>
+              </td>
+            </tr>
 
-            </tbody>
-          </Table>
+          </tbody>
+        </Table>
 
 
 
 
 
 
-        </div>
-      </Container>
+      </div>
+    </Container >
     </>
   )
 }
