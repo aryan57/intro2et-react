@@ -1,7 +1,7 @@
 import React from "react"
 import { Card, Button, Badge } from 'react-bootstrap'
 
-const PostCard = ({ userName = "", postMediaURL = "", postDescription = "", timestamp = "" }) => {
+export const PostCard = ({ userName = "", postMediaURL = "", postDescription = "", timestamp = "" }) => {
 
 	const dt = new Date(parseInt(timestamp)*1000);
 	let str = dt.toLocaleTimeString('en-GB', {
@@ -30,5 +30,3 @@ const PostCard = ({ userName = "", postMediaURL = "", postDescription = "", time
 		</Card>
 	)
 }
-
-export default PostCard;

@@ -3,7 +3,7 @@ import { Button, Navbar, Alert, Nav } from "react-bootstrap"
 import { useAuth } from "../contexts/AuthContext"
 import { useHistory } from "react-router-dom"
 
-export default function Header() {
+export const Header = () => {
     const [error, setError] = useState("")
     const { logout, authState } = useAuth()
     const history = useHistory()

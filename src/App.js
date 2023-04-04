@@ -1,14 +1,14 @@
 import React from "react"
 import { AuthProvider } from "./contexts/AuthContext"
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
-import Dashboard from "./Pages/Dashboard"
-import Category from "./Pages/Category"
-import Post from "./Pages/Post"
-import Login from "./Pages/Login"
-import Signup from "./Pages/Signup"
-import PrivateRoute from "./Utilities/PrivateRoute"
+import {Dashboard} from "./Pages/Dashboard"
+import {Category} from "./Pages/Category"
+import {Post} from "./Pages/Post"
+import {Login} from "./Pages/Login"
+import {Signup} from "./Pages/Signup"
+import {PrivateRoute} from "./Utilities/PrivateRoute"
 
-function App() {
+export const App = () => {
   return (
         <Router>
           <AuthProvider>
@@ -27,4 +27,3 @@ function App() {
   )
 }
 
-export default App

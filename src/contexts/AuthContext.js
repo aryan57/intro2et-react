@@ -25,9 +25,9 @@ export const AuthProvider = ({ children }) => {
 	})
 
 
-	const signup = async (email, password) => {
+	const signup = async (email, password,role) => {
 		try {
-			const response = await axios.post(`${API_URL}/user/signup`, { email, password });
+			const response = await axios.post(`${API_URL}/user/signup`, { email, password,role });
 			if (response.status !== 200) {
 				return { error: true, message: response.data }
 			}

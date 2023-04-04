@@ -1,10 +1,10 @@
 import React, { useState, useRef } from "react"
-import Header from '../Utilities/Header'
+import { Header } from '../Utilities/Header'
 import { Container, Table, Form, Button, Alert, FormControl, InputGroup } from 'react-bootstrap'
 import { useAuth } from "../contexts/AuthContext"
 import { useGeolocated } from "react-geolocated";
 
-export default function Dashboard() {
+export const Dashboard = () => {
 
   const [file, setFile] = useState(null)
   const [imgPublicUrl, setImgPublicUrl] = useState(null)
@@ -76,7 +76,7 @@ export default function Dashboard() {
 
   async function uploadNewPost() {
 
-    if(!categoryName){
+    if (!categoryName) {
       setError("Please upload an image first")
       return
     }
@@ -123,23 +123,23 @@ export default function Dashboard() {
       <Header />
       <Container className="d-flex align-items-center justify-content-center">
         <div className="w-100" style={{ maxWidth: "450px", marginTop: 50 }}>
-
           <h2 className="text-center mb-4">Create Post</h2>
           {error && <Alert variant="danger">{error}</Alert>}
           {success && <Alert variant="success">{success}</Alert>}
 
           <Table striped bordered hover responsive style={{ marginTop: 10 }}>
             <tbody>
+
               {
                 predictionList &&
                 <tr >
                   <td colSpan={2}>
                     <Form>
 
-                      <div key={`inline-checkbox`} className="" style={{ height: '100px',overflowY: 'scroll' }}>
+                      <div key={`inline-checkbox`} className="" style={{ height: '100px', overflowY: 'scroll' }}>
                         {predictionList.map((predictionCategory) => (
                           <Form.Check
-                      
+
                             label={predictionCategory}
                             value={predictionCategory}
                             key={predictionCategory}
@@ -177,28 +177,21 @@ export default function Dashboard() {
               <tr>
                 <td colSpan={2}  >
                   <InputGroup >
-                    <FormControl type="text" ref={descriptionRef}  placeholder="Description (Optional)" />
+                    <FormControl type="text" ref={descriptionRef} placeholder="Description (Optional)" />
                   </InputGroup>
                 </td>
               </tr>
               <tr>
                 <td colSpan={2}>
-                <Button disabled={loading} className="w-100" onClick={uploadNewPost}>
-                  Add New Post
-                </Button>
-              </td>
-            </tr>
-
-          </tbody>
-        </Table>
-
-
-
-
-
-
-      </div>
-    </Container >
+                  <Button disabled={loading} className="w-100" onClick={uploadNewPost}>
+                    Add New Post
+                  </Button>
+                </td>
+              </tr>
+            </tbody>
+          </Table>
+        </div>
+      </Container >
     </>
   )
 }

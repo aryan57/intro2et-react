@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from "react"
-import Header from '../Utilities/Header'
+import {Header} from '../Utilities/Header'
 import { Container, Table, Form, Button, Alert, FormControl, InputGroup } from 'react-bootstrap'
 import { useAuth } from "../contexts/AuthContext"
-import PostCard from "../Utilities/PostCard"
+import {PostCard} from "../Utilities/PostCard"
 
-export default function Post() {
+export const Post = () => {
 
 	const [loading, setLoading] = useState(false)
 	const [error, setError] = useState("")

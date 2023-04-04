@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from "react"
-import Header from '../Utilities/Header'
+import {Header} from '../Utilities/Header'
 import { Container, Table, Button, Alert, FormControl, InputGroup } from 'react-bootstrap'
 import { useAuth } from "../contexts/AuthContext"
 
-export default function Category() {
+export const Category = () => {
 
 	const [loading, setLoading] = useState(false)
 	const [error, setError] = useState("")
@@ -65,11 +65,9 @@ export default function Category() {
 
 		try {
 			const categoryName = e.target.value;
-			console.log(categoryName)
 			const nameToIdMap = JSON.parse(localStorage.getItem('categoryMapping_nameToIdMap'))
 			if (!nameToIdMap) throw { message: "Mapping not found" }
 			const categoryId = nameToIdMap[categoryName]
-			console.log(nameToIdMap, categoryName, nameToIdMap[categoryName]);
 			if (!categoryId) throw { message: `categoryId for ${categoryName} not found` }
 			const result = await deleteCategoryById(categoryId)
 			if (result && result.error) throw result
