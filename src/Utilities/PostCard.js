@@ -19,7 +19,7 @@ export const PostCard = ({ userName = "", postMediaURL = "", postDescription = "
 						<h5>{userName}</h5>
 					</div>
 
-					<Button value={postId} onClick={deleteHandler} variant="outline-danger" size="sm" >
+					<Button title="Delete this post" value={postId} onClick={deleteHandler} variant="outline-danger" size="sm" >
 						X
 					</Button>
 				</div>

@@ -54,13 +54,17 @@ export const AuthProvider = ({ children }) => {
 			}
 			let nameToIdMap = {}
 			let idToNameMap = {}
+			let nonTrainedCategoriesArray = []
 			let arr = response.data.list
 			for (let i = 0; i < arr.length; i++) {
 				nameToIdMap[arr[i]['categoryName']] = arr[i]['id']
 				idToNameMap[arr[i]['id']] = arr[i]['categoryName']
+				if(!arr[i]['isTrained'])
+					nonTrainedCategoriesArray.push(arr[i]['categoryName'])
 			}
 			localStorage.setItem('categoryMapping_nameToIdMap', JSON.stringify(nameToIdMap))
 			localStorage.setItem('categoryMapping_idToNameMap', JSON.stringify(idToNameMap))
+			localStorage.setItem('nonTrainedCategoriesArray', JSON.stringify(nonTrainedCategoriesArray))
 			return arr
 
 		} catch (err) {
@@ -125,7 +129,7 @@ export const AuthProvider = ({ children }) => {
 		}
 	}
 
-	const getCategories = async () => {
+	const getAllCategories = async () => {
 		try {
 			const str = localStorage.getItem('categoryMapping_idToNameMap')
 			if(!str)return { error: true, message: 'categoryMapping_idToNameMap not found in local storage' }
@@ -135,6 +139,18 @@ export const AuthProvider = ({ children }) => {
 			for (const entry of map.entries()) {
 				lst.push(entry[1]);
 			}
+			return lst
+		} catch (err) {
+			return { error: true, message: err.message }
+		}
+	}
+	const getNonTrainedCategories = async () => {
+		try {
+			const str = localStorage.getItem('nonTrainedCategoriesArray')
+			if(!str)return { error: true, message: 'nonTrainedCategoriesArray not found in local storage' }
+			const lst = JSON.parse(str);
+			if(!lst)return { error: true, message: 'error in parsing the list' }
+			
 			return lst
 		} catch (err) {
 			return { error: true, message: err.message }
@@ -347,7 +363,8 @@ export const AuthProvider = ({ children }) => {
 		predict,
 		updateCategoryMappings,
 		createCategory,
-		getCategories,
+		getAllCategories,
+		getNonTrainedCategories,
 		getPosts,
 		deleteCategoryById,
 		deletePostById,

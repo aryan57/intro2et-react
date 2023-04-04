@@ -12,12 +12,12 @@ export const Category = () => {
 	const [categoryList, setCategoryList] = useState(null)
 
 
-	const { createCategory, updateCategoryMappings, getCategories, deleteCategoryById } = useAuth()
+	const { createCategory, updateCategoryMappings, getAllCategories, deleteCategoryById } = useAuth()
 
 	useEffect(() => {
 		updateCategoryMappings().then((arr) => {
 			if (arr && arr.error) throw arr;
-			return getCategories()
+			return getAllCategories()
 		}).then((lst) => {
 			if (lst && lst.error) throw lst;
 			setCategoryList(lst)
@@ -45,7 +45,7 @@ export const Category = () => {
 			const result = await updateCategoryMappings()
 			if (result && result.error) throw result
 
-			const lst = await getCategories()
+			const lst = await getAllCategories()
 			setCategoryList(lst)
 			setSuccess(createCategoryResult)
 
@@ -75,7 +75,7 @@ export const Category = () => {
 			const arr = await updateCategoryMappings()
 			if (arr && arr.error) throw arr
 			
-			const  lst = await getCategories()
+			const  lst = await getAllCategories()
 			if (lst && lst.error) throw lst
 			setCategoryList(lst)
 
@@ -122,7 +122,7 @@ export const Category = () => {
 										</td>
 										<td>
 											<div style={{ display: 'flex', justifyContent: 'center' }}>
-												<Button  value={category} onClick={deleteCategory} variant="outline-danger" size="sm" >
+												<Button title="Delete this category"  value={category} onClick={deleteCategory} variant="outline-danger" size="sm" >
 													X
 												</Button>
 											</div>

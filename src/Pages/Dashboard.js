@@ -22,7 +22,7 @@ export const Dashboard = () => {
       userDecisionTimeout: 5000,
     });
 
-  const { createPost, whoami, uploadPostImage, predict, updateCategoryMappings } = useAuth()
+  const { createPost, uploadPostImage, predict, getNonTrainedCategories } = useAuth()
 
   const handleCategoryChange = (event) => {
     setCategoryName(event.target.value)
@@ -56,8 +56,14 @@ export const Dashboard = () => {
       setImgPublicUrl(public_url)
       setSuccess("Image Upload Successfull!")
 
-      const prediction_list = await predict(file);
+      let prediction_list = await predict(file);
       if (prediction_list && prediction_list.error) throw prediction_list
+
+      const nonTrainedCategoriesArray = await getNonTrainedCategories()
+      if (nonTrainedCategoriesArray && nonTrainedCategoriesArray.error) throw nonTrainedCategoriesArray
+
+      // add the non ml trained categories in the end
+      prediction_list = prediction_list.concat(nonTrainedCategoriesArray)
 
       setPredictionList(prediction_list)
       setCategoryName(prediction_list[0])
@@ -159,6 +165,7 @@ export const Dashboard = () => {
 
               <tr>
                 <td>
+                  {/* TODO : Add 64x640 cropping */}
                   <Form>
                     <Form.File
                       accept="image/*"
