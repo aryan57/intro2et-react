@@ -16,8 +16,10 @@ export default function Post() {
 
 	useEffect(() => {
 		getPosts().then((lst) => {
-			console.log(lst);
+			if(lst && lst.error)throw lst;
 			setPostList(lst)
+		}).catch(err=>{
+			setError(err.message)
 		})
 	}, [])
 

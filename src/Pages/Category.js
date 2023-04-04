@@ -1,6 +1,6 @@
-import React, { useState, useRef,useEffect } from "react"
+import React, { useState, useRef, useEffect } from "react"
 import Header from '../Utilities/Header'
-import { Container, Table, Form, Button, Alert, FormControl, InputGroup } from 'react-bootstrap'
+import { Container, Table, Button, Alert, FormControl, InputGroup } from 'react-bootstrap'
 import { useAuth } from "../contexts/AuthContext"
 
 export default function Category() {
@@ -12,13 +12,19 @@ export default function Category() {
 	const [categoryList, setCategoryList] = useState(null)
 
 
-	const { createCategory, updateCategoryMappings, getCategories } = useAuth()
+	const { createCategory, updateCategoryMappings, getCategories, deleteCategoryById } = useAuth()
 
-	useEffect(()=>{
-		getCategories().then((lst)=>{
+	useEffect(() => {
+		updateCategoryMappings().then((arr) => {
+			if (arr && arr.error) throw arr;
+			return getCategories()
+		}).then((lst) => {
+			if (lst && lst.error) throw lst;
 			setCategoryList(lst)
+		}).catch(err => {
+			setError(err.message)
 		})
-	},[])
+	}, [])
 
 	async function createNewCategory() {
 
@@ -35,18 +41,51 @@ export default function Category() {
 
 			const createCategoryResult = await createCategory(categoryRef.current.value)
 			if (createCategoryResult && createCategoryResult.error) throw createCategoryResult
+
 			const result = await updateCategoryMappings()
 			if (result && result.error) throw result
 
 			const lst = await getCategories()
 			setCategoryList(lst)
-
 			setSuccess(createCategoryResult)
+
 		} catch (err) {
 			setError(err.message)
 		} finally {
 			setLoading(false)
 			categoryRef.current.value = ""
+		}
+	}
+
+	async function deleteCategory(e) {
+		e.preventDefault()
+		setLoading(true)
+		setSuccess("")
+		setError("")
+
+		try {
+			const categoryName = e.target.value;
+			console.log(categoryName)
+			const nameToIdMap = JSON.parse(localStorage.getItem('categoryMapping_nameToIdMap'))
+			if (!nameToIdMap) throw { message: "Mapping not found" }
+			const categoryId = nameToIdMap[categoryName]
+			console.log(nameToIdMap, categoryName, nameToIdMap[categoryName]);
+			if (!categoryId) throw { message: `categoryId for ${categoryName} not found` }
+			const result = await deleteCategoryById(categoryId)
+			if (result && result.error) throw result
+			
+			const arr = await updateCategoryMappings()
+			if (arr && arr.error) throw arr
+			
+			const  lst = await getCategories()
+			setCategoryList(lst)
+
+			setSuccess(result)
+
+		} catch (err) {
+			setError(err.message)
+		} finally {
+			setLoading(false)
 		}
 	}
 
@@ -79,8 +118,15 @@ export default function Category() {
 
 								categoryList.map((category) => (
 									<tr key={category}>
-										<td colSpan={2}>
+										<td >
 											{category}
+										</td>
+										<td>
+											<div style={{ display: 'flex', justifyContent: 'center' }}>
+												<Button  value={category} onClick={deleteCategory} variant="outline-danger" size="sm" >
+													X
+												</Button>
+											</div>
 										</td>
 									</tr>
 								))

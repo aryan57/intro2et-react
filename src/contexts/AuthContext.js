@@ -61,7 +61,7 @@ export const AuthProvider = ({ children }) => {
 			}
 			localStorage.setItem('categoryMapping_nameToIdMap', JSON.stringify(nameToIdMap))
 			localStorage.setItem('categoryMapping_idToNameMap', JSON.stringify(idToNameMap))
-			return response
+			return arr
 
 		} catch (err) {
 			await refresh()
@@ -81,6 +81,25 @@ export const AuthProvider = ({ children }) => {
 			}
 
 			return response.data.list
+
+		} catch (err) {
+			await refresh()
+			return { error: true, message: JSON.stringify([err.message, "We have refreshed the token also, can you try again?"]) }
+		}
+	}
+
+	const deleteCategoryById = async (categoryId) => {
+		try {
+			const response = await axios.delete(`${API_URL}/category/deleteCategory/${categoryId}`);
+			if (response.status !== 200) {
+				return { error: true, message: response.data }
+			}
+
+			if (response.data.success !== true) {
+				return { error: true, message: response.data.message }
+			}
+
+			return response.data.message
 
 		} catch (err) {
 			await refresh()
@@ -312,6 +331,7 @@ export const AuthProvider = ({ children }) => {
 		createCategory,
 		getCategories,
 		getPosts,
+		deleteCategoryById,
 		authState
 	}
 
