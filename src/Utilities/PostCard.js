@@ -1,13 +1,15 @@
 import React from "react"
-import { Card, Button, Badge } from 'react-bootstrap'
+import { Card, Button, Badge, Table, ListGroup } from 'react-bootstrap'
 
-export const PostCard = ({ userName = "", postMediaURL = "", postDescription = "", timestamp = "" }) => {
+export const PostCard = ({ userName = "", postMediaURL = "", postDescription = "", timestamp = "", categoryName = "", latitude = "", longitude = "", postId = "",deleteHandler=null }) => {
 
-	const dt = new Date(parseInt(timestamp)*1000);
-	let str = dt.toLocaleTimeString('en-GB', {
+	const dt = new Date(parseInt(timestamp) * 1000);
+	let strTimestamp = dt.toLocaleTimeString('en-GB', {
 		day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true
 	});
-	if (!str) str = "";
+	if (!strTimestamp) strTimestamp = "";
+
+	const strLocationLink = "https://maps.google.com/?q=" + latitude + "," + longitude
 
 	return (
 		<Card style={{ marginTop: "15px" }}>
@@ -16,17 +18,19 @@ export const PostCard = ({ userName = "", postMediaURL = "", postDescription = "
 					<div>
 						<h5>{userName}</h5>
 					</div>
-					<div>
-						{str}
-					</div>
+
+					<Button value={postId} onClick={deleteHandler} variant="outline-danger" size="sm" >
+						X
+					</Button>
 				</div>
 			</Card.Header>
 			<Card.Img variant="top" src={postMediaURL} alt={"Error in retrieving " + userName + "'s photo"} />
-			<Card.Body>
-				<Card.Text>
-					{postDescription}
-				</Card.Text>
-			</Card.Body>
+			<ListGroup variant="flush">
+				<ListGroup.Item><b>Description : </b>{postDescription}</ListGroup.Item>
+				<ListGroup.Item><b>Category : </b>{categoryName}</ListGroup.Item>
+				<ListGroup.Item><b>Location : </b><a href={strLocationLink}>({latitude},{longitude})</a></ListGroup.Item>
+				<ListGroup.Item><b>Time : </b>{strTimestamp}</ListGroup.Item>
+			</ListGroup>
 		</Card>
 	)
 }

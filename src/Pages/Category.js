@@ -76,6 +76,7 @@ export const Category = () => {
 			if (arr && arr.error) throw arr
 			
 			const  lst = await getCategories()
+			if (lst && lst.error) throw lst
 			setCategoryList(lst)
 
 			setSuccess(result)

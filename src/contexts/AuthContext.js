@@ -106,6 +106,24 @@ export const AuthProvider = ({ children }) => {
 			return { error: true, message: JSON.stringify([err.message, "We have refreshed the token also, can you try again?"]) }
 		}
 	}
+	const deletePostById = async (postId) => {
+		try {
+			const response = await axios.delete(`${API_URL}/post/deletePost/${postId}`);
+			if (response.status !== 200) {
+				return { error: true, message: response.data }
+			}
+
+			if (response.data.success !== true) {
+				return { error: true, message: response.data.message }
+			}
+
+			return response.data.message
+
+		} catch (err) {
+			await refresh()
+			return { error: true, message: JSON.stringify([err.message, "We have refreshed the token also, can you try again?"]) }
+		}
+	}
 
 	const getCategories = async () => {
 		try {
@@ -332,6 +350,7 @@ export const AuthProvider = ({ children }) => {
 		getCategories,
 		getPosts,
 		deleteCategoryById,
+		deletePostById,
 		authState
 	}
 
