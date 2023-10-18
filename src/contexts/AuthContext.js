@@ -3,8 +3,11 @@ import axios from 'axios';
 
 
 const AuthContext = createContext();
-// export const API_URL = 'https://btp-backend-flask-inpm4aannq-el.a.run.app/api/v1'
-export const API_URL = 'http://localhost:8756/api/v1'
+
+export const API_URL = 
+	process.env.NODE_ENV === 'development' ?
+	process.env.REACT_APP_DEV_API_URL : process.env.REACT_APP_PROD_API_URL
+
 
 export const useAuth = () => {
 	return useContext(AuthContext)
