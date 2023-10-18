@@ -12,7 +12,7 @@ export const Post = () => {
 	const [postList, setPostList] = useState(null)
 
 
-	const { getPosts, deletePostById } = useAuth()
+	const { getPosts, deletePostById, getImgUrl } = useAuth()
 
 	useEffect(() => {
 		getPosts().then((lst) => {
@@ -64,7 +64,7 @@ export const Post = () => {
 							<PostCard
 								key={post.id}
 								userName={post.email}
-								postMediaURL={post.imgLink}
+								postMediaURL={getImgUrl(post.imgID)}
 								postDescription={post.description}
 								timestamp={post.unixTime}
 								categoryName={post.categoryName}

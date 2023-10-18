@@ -1,15 +1,16 @@
 import React, { useRef, useState } from "react"
 import { Form, Button, Card, Alert, Container, ButtonGroup, ToggleButton } from "react-bootstrap"
 import { useAuth } from "../contexts/AuthContext"
-import { Link, useHistory } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 
 export const Signup = () => {
+  const nameRef = useRef()
   const emailRef = useRef()
   const passwordRef = useRef()
   const { signup } = useAuth()
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
-  const history = useHistory()
+  const navigate = useNavigate()
   const roles = [
     { name: 'User', value: 'USER' },
     { name: 'Admin', value: 'ADMIN' },];
@@ -21,11 +22,11 @@ export const Signup = () => {
 
     setError("")
     setLoading(true)
-    const result = await signup(emailRef.current.value, passwordRef.current.value,roleValue)
+    const result = await signup(nameRef.current.value, emailRef.current.value, passwordRef.current.value, roleValue)
     if (result && result.error) {
       setError(result.message)
     } else {
-      history.push("/")
+      navigate("/")
     }
     setLoading(false)
   }
@@ -43,6 +44,11 @@ export const Signup = () => {
               {error && <Alert variant="danger">{error}</Alert>}
               <Form onSubmit={handleSubmit}>
 
+              <Form.Group id="name">
+                  <Form.Label>Name</Form.Label>
+                  <Form.Control ref={nameRef} required />
+                </Form.Group>
+                
                 <Form.Group id="email">
                   <Form.Label>Email</Form.Label>
                   <Form.Control type="email" ref={emailRef} required />

@@ -3,8 +3,8 @@ import axios from 'axios';
 
 
 const AuthContext = createContext();
-export const API_URL = 'https://btp-backend-flask-inpm4aannq-el.a.run.app/api/v1'
-// export const API_URL = 'http://localhost:8080/api/v1'
+// export const API_URL = 'https://btp-backend-flask-inpm4aannq-el.a.run.app/api/v1'
+export const API_URL = 'http://localhost:8756/api/v1'
 
 export const useAuth = () => {
 	return useContext(AuthContext)
@@ -25,20 +25,15 @@ export const AuthProvider = ({ children }) => {
 	})
 
 
-	const signup = async (email, password,role) => {
+	const signup = async (name,email,password,role) => {
 		try {
-			const response = await axios.post(`${API_URL}/user/signup`, { email, password,role });
+			const response = await axios.post(`${API_URL}/user/signup`, { email, password,role,name });
 			if (response.status !== 200) {
 				return { error: true, message: response.data }
 			}
-
-			if (response.data.success !== true) {
-				return { error: true, message: response.data.message }
-			}
-
 			return response
 		} catch (err) {
-			return { error: true, message: err.message }
+			return { error: true, message: err.response.data.message }
 		}
 	}
 
@@ -49,9 +44,7 @@ export const AuthProvider = ({ children }) => {
 				return { error: true, message: response.data }
 			}
 
-			if (response.data.success !== true) {
-				return { error: true, message: response.data.message }
-			}
+			
 			let nameToIdMap = {}
 			let idToNameMap = {}
 			let nonTrainedCategoriesArray = []
@@ -69,45 +62,42 @@ export const AuthProvider = ({ children }) => {
 
 		} catch (err) {
 			await refresh()
-			return { error: true, message: JSON.stringify([err.message, "We have refreshed the token also, can you try again?"]) }
+			return { error: true, message: JSON.stringify([err.response.data.message, "We have refreshed the token also, can you try again?"]) }
 		}
 	}
 
 	const getPosts = async () => {
 		try {
 			const response = await axios.get(`${API_URL}/post/allPosts`);
-			if (response.status !== 200) {
-				return { error: true, message: response.data }
-			}
-
-			if (response.data.success !== true) {
-				return { error: true, message: response.data.message }
-			}
-
+			
 			return response.data.list
 
 		} catch (err) {
 			await refresh()
-			return { error: true, message: JSON.stringify([err.message, "We have refreshed the token also, can you try again?"]) }
+			return { error: true, message: JSON.stringify([err.response.data.message, "We have refreshed the token also, can you try again?"]) }
 		}
 	}
 
 	const deleteCategoryById = async (categoryId) => {
 		try {
 			const response = await axios.delete(`${API_URL}/category/deleteCategory/${categoryId}`);
-			if (response.status !== 200) {
-				return { error: true, message: response.data }
-			}
-
-			if (response.data.success !== true) {
-				return { error: true, message: response.data.message }
-			}
-
 			return response.data.message
 
 		} catch (err) {
-			await refresh()
-			return { error: true, message: JSON.stringify([err.message, "We have refreshed the token also, can you try again?"]) }
+			if(err.response.status === 401) { // when token expires we always get 401 Unauthorized status code
+				console.log('token expired refreshing it...');
+				const refreshResponse = await refresh()
+				if(refreshResponse.status===200){
+					console.log('refresh successfull, now calling the function again');
+					return deleteCategoryById(categoryId)
+				}
+				else {
+					console.log('refresh NOT successfull, logging out...');
+					return await logout();
+				}
+			}
+			
+			return { error: true, message: JSON.stringify(err.response.data.message) }
 		}
 	}
 	const deletePostById = async (postId) => {
@@ -117,15 +107,13 @@ export const AuthProvider = ({ children }) => {
 				return { error: true, message: response.data }
 			}
 
-			if (response.data.success !== true) {
-				return { error: true, message: response.data.message }
-			}
+			
 
 			return response.data.message
 
 		} catch (err) {
 			await refresh()
-			return { error: true, message: JSON.stringify([err.message, "We have refreshed the token also, can you try again?"]) }
+			return { error: true, message: JSON.stringify([err.response.data.message, "We have refreshed the token also, can you try again?"]) }
 		}
 	}
 
@@ -165,10 +153,6 @@ export const AuthProvider = ({ children }) => {
 				return { error: true, message: response.data }
 			}
 
-			if (response.data.success !== true) {
-				return { error: true, message: response.data.message }
-			}
-
 			setAuthState({
 				accessToken: response.data.user.access_token,
 				refreshToken: response.data.user.refresh_token,
@@ -180,6 +164,7 @@ export const AuthProvider = ({ children }) => {
 			localStorage.setItem('accessToken', response.data.user.access_token)
 			localStorage.setItem('refreshToken', response.data.user.refresh_token)
 			localStorage.setItem('userEmail', email)
+			
 			await updateCategoryMappings()
 			return response;
 
@@ -204,9 +189,7 @@ export const AuthProvider = ({ children }) => {
 				return { error: true, message: response.data }
 			}
 
-			if (response.data.success !== true) {
-				return { error: true, message: response.data.message }
-			}
+			
 
 			setAuthState({
 				accessToken: response.data.user.access_token,
@@ -223,28 +206,25 @@ export const AuthProvider = ({ children }) => {
 		} catch (err) {
 			// there is an error in refresh also, so logout
 			await logout()
-			alert('Refresh token failed. Logging out.')
 			return { error: true, message: err.message }
 		}
 	}
 
-	const createPost = async (description, imgLink, unixTime, longitude, latitude, categoryId) => {
+	const createPost = async (description, imgID, unixTime, longitude, latitude, categoryId) => {
 		try {
-			const response = await axios.post(`${API_URL}/post/createPost`, { description, imgLink, unixTime, longitude, latitude, categoryId });
+			const response = await axios.post(`${API_URL}/post/createPost`, { description, imgID, unixTime, longitude, latitude, categoryId });
 
 			if (response.status !== 200) {
 				return { error: true, message: response.data }
 			}
 
-			if (response.data.success !== true) {
-				return { error: true, message: response.data.message }
-			}
+			
 
 			return response.data.message;
 
 		} catch (err) {
 			await refresh()
-			return { error: true, message: JSON.stringify([err.message, "We have refreshed the token also, can you try again?"]) }
+			return { error: true, message: JSON.stringify([err.response.data.message, "We have refreshed the token also, can you try again?"]) }
 		}
 	}
 
@@ -259,39 +239,16 @@ export const AuthProvider = ({ children }) => {
 				return { error: true, message: response.data }
 			}
 
-			if (response.data.success !== true) {
-				return { error: true, message: response.data.message }
-			}
-
-			return response.data.public_url;
+			return response.data.imgID;
 
 		} catch (err) {
 			await refresh()
-			return { error: true, message: JSON.stringify([err.message, "We have refreshed the token also, can you try again?"]) }
+			return { error: true, message: JSON.stringify([err.response.data.message, "We have refreshed the token also, can you try again?"]) }
 		}
 	}
 
-	const predict = async (img) => {
-		try {
-			let formdata = new FormData();
-			formdata.append("file", img, img.name);
-
-			const response = await axios.post(`${API_URL}/predict/predict`, formdata);
-
-			if (response.status !== 200) {
-				return { error: true, message: response.data }
-			}
-
-			if (response.data.success !== true) {
-				return { error: true, message: response.data.message }
-			}
-
-			return response.data.prediction;
-
-		} catch (err) {
-			await refresh()
-			return { error: true, message: JSON.stringify([err.message, "We have refreshed the token also, can you try again?"]) }
-		}
+	const getImgUrl =  (imgID) => {
+		return `${API_URL}/post/getPostImage/${imgID}`
 	}
 
 	const whoami = async () => {
@@ -303,14 +260,12 @@ export const AuthProvider = ({ children }) => {
 				return { error: true, message: response.data }
 			}
 
-			if (response.data.success !== true) {
-				return { error: true, message: response.data.message }
-			}
+			
 			return response.data.user;
 
 		} catch (err) {
 			await refresh()
-			return { error: true, message: JSON.stringify([err.message, "We have refreshed the token also, can you try again?"]) }
+			return { error: true, message: JSON.stringify([err.response.data.message, "We have refreshed the token also, can you try again?"]) }
 		}
 	}
 
@@ -334,20 +289,16 @@ export const AuthProvider = ({ children }) => {
 		try {
 
 			const response = await axios.post(`${API_URL}/category/createCategory`, { categoryName });
-
+			
 			if (response.status !== 200) {
 				return { error: true, message: response.data }
-			}
-
-			if (response.data.success !== true) {
-				return { error: true, message: response.data.message }
 			}
 
 			return response.data.message;
 
 		} catch (err) {
 			await refresh()
-			return { error: true, message: JSON.stringify([err.message, "We have refreshed the token also, can you try again?"]) }
+			return { error: true, message: JSON.stringify([err.response.data.message, "We have refreshed the token also, can you try again?"]) }
 		}
 	}
 
@@ -360,7 +311,7 @@ export const AuthProvider = ({ children }) => {
 		createPost,
 		whoami,
 		uploadPostImage,
-		predict,
+		getImgUrl,
 		updateCategoryMappings,
 		createCategory,
 		getAllCategories,

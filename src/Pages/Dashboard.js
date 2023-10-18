@@ -7,7 +7,7 @@ import { useGeolocated } from "react-geolocated";
 export const Dashboard = () => {
 
   const [file, setFile] = useState(null)
-  const [imgPublicUrl, setImgPublicUrl] = useState(null)
+  const [imgID, setImgID] = useState(null)
   const [predictionList, setPredictionList] = useState(null)
   const [categoryName, setCategoryName] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -43,21 +43,31 @@ export const Dashboard = () => {
     setLoading(true)
     setSuccess("")
     setError("")
-    setImgPublicUrl(null)
+    setImgID(null)
     setPredictionList(null)
     setCategoryName(null)
 
     try {
 
 
-      const public_url = await uploadPostImage(file);
-      if (public_url && public_url.error) throw public_url
+      const imgID = await uploadPostImage(file);
+      if (imgID && imgID.error) throw imgID
 
-      setImgPublicUrl(public_url)
+      setImgID(imgID)
       setSuccess("Image Upload Successfull!")
 
-      let prediction_list = await predict(file);
-      if (prediction_list && prediction_list.error) throw prediction_list
+      /**
+       
+        let prediction_list = await predict(file);
+        if (prediction_list && prediction_list.error) throw prediction_list
+
+        predict api is not supported from backend api now,
+        now, do local image classification, currently only in android app
+
+        So, for now we have the prediction,list as a static list,
+        and not according to the sorted of their probablities of their classes
+       */
+      let prediction_list = ['fallen-tree','garbage','pothole','road']
 
       const nonTrainedCategoriesArray = await getNonTrainedCategories()
       if (nonTrainedCategoriesArray && nonTrainedCategoriesArray.error) throw nonTrainedCategoriesArray
@@ -71,7 +81,7 @@ export const Dashboard = () => {
 
     } catch (err) {
       setError(err.message)
-      setImgPublicUrl(null)
+      setImgID(null)
       setPredictionList(null)
       setCategoryName(null)
     } finally {
@@ -113,7 +123,7 @@ export const Dashboard = () => {
 
       const unixTime = Math.floor(Date.now() / 1000);
 
-      const result = await createPost(descriptionRef.current.value, imgPublicUrl, unixTime, location.longitude, location.latitude, categoryId)
+      const result = await createPost(descriptionRef.current.value, imgID, unixTime, location.longitude, location.latitude, categoryId)
       if (result && result.error) throw result
       setSuccess(result)
     } catch (err) {
@@ -166,14 +176,13 @@ export const Dashboard = () => {
               <tr>
                 <td>
                   {/* TODO : Add 64x640 cropping */}
-                  <Form>
-                    <Form.File
-                      accept="image/*"
-                      label={file ? file.name : "Choose Picture"}
-                      custom
-                      onChange={(e) => { setFile(e.target.files[0]) }}
-                    />
-                  </Form>
+                  <Form.Group controlId="formFile" >
+                    <Form.Control 
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => { setFile(e.target.files[0]) }}
+                    label={file ? file.name : "Choose Picture"} />
+                  </Form.Group>
                 </td>
                 <td>
                   <Button disabled={loading} className="w-10" onClick={uploadImageAndGetData}>

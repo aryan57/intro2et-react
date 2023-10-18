@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react"
 import { Form, Button, Card, Alert, Container } from "react-bootstrap"
 import { useAuth } from "../contexts/AuthContext"
-import { Link, useHistory } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 
 export const Login = () => {
   const emailRef = useRef()
@@ -9,7 +9,7 @@ export const Login = () => {
   const { login } = useAuth()
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
-  const history = useHistory()
+  const navigate = useNavigate()
 
   async function handleEmailSignin(e) {
     e.preventDefault()
@@ -21,7 +21,7 @@ export const Login = () => {
     if(result && result.error){
       setError(result.message)
     }else{
-      history.push("/")
+      navigate("/")
     }
 
     setLoading(false)
@@ -46,7 +46,7 @@ export const Login = () => {
                   <Form.Label>Password</Form.Label>
                   <Form.Control type="password" ref={passwordRef} required />
                 </Form.Group>
-                <Button disabled={loading} className="w-100" type="submit">
+                <Button disabled={loading} className="w-100 mt-4" type="submit">
                   Log In
                 </Button>
               </Form>
