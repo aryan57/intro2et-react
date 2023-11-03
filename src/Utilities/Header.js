@@ -30,6 +30,7 @@ export const Header = () => {
                         <Nav navbarScroll>
                             <Nav.Link href="/">Create Post</Nav.Link>
                             <Nav.Link href="/post">Posts</Nav.Link>
+                            <Nav.Link href="/mapView">MapView</Nav.Link>
                             <Nav.Link href="/category">Categories</Nav.Link>
                             <Button variant="secondary" onClick={handleLogout}>Logout</Button>
                         </Nav>

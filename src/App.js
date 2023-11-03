@@ -6,6 +6,7 @@ import { Category } from "./Pages/Category"
 import { Post } from "./Pages/Post"
 import { Login } from "./Pages/Login"
 import { Signup } from "./Pages/Signup"
+import { MapView } from "./Pages/MapView"
 import { PrivateRoute } from "./Utilities/PrivateRoute"
 
 export const App = () => {
@@ -18,6 +19,7 @@ export const App = () => {
             <Route path="/" element={<Dashboard />} />
             <Route path="/category" element={<Category />} />
             <Route path="/post" element={<Post />} />
+            <Route path="/mapView" element={<MapView />} />
           </Route>
 
           <Route path="/signup" element={<Signup />} />

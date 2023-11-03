@@ -1,0 +1,6 @@
+/* height of the container */
+.leaflet-container {
+	height: 90vh;
+	/* width: 100%;
+	border-radius: 2rem; */
+  }
