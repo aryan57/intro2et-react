@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import { Header } from '../Utilities/Header'
-import { Container, Table, Form, Button, Alert, FormControl, InputGroup } from 'react-bootstrap'
+import { Container, Alert } from 'react-bootstrap'
 import { useAuth } from "../contexts/AuthContext"
 import { PostCard } from "../Utilities/PostCard"
 
@@ -10,7 +10,6 @@ export const Post = () => {
 	const [error, setError] = useState("")
 	const [success, setSuccess] = useState("")
 	const [postList, setPostList] = useState(null)
-
 
 	const { getPosts, deletePostById, getImgUrl } = useAuth()
 
@@ -37,7 +36,6 @@ export const Post = () => {
 			const lst = await getPosts()
 			if (lst && lst.error) throw lst
 			setPostList(lst)
-
 			setSuccess(result)
 
 		} catch (err) {
@@ -46,7 +44,6 @@ export const Post = () => {
 			setLoading(false)
 		}
 	}
-
 
 	return (
 		<>

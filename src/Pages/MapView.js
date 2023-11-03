@@ -1,18 +1,21 @@
-import React, { useState, useEffect } from "react"
-import { Header } from '../Utilities/Header'
-import { useAuth } from "../contexts/AuthContext"
+import React, { useState, useEffect } from "react";
+import { Header } from '../Utilities/Header';
+import { useAuth } from "../contexts/AuthContext";
 import { MapContainer, TileLayer, Marker, Popup, WMSTileLayer } from "react-leaflet";
 import { Icon } from "leaflet";
-import "leaflet/dist/leaflet.css"
-import "../css/style.css"
+import "leaflet/dist/leaflet.css";
+import "../css/style.css";
 
 
 
 export const MapView = () => {
 
 	const [postList, setPostList] = useState(null)
-	const map_inital_center_coordinates = [22.31844, 87.3061777] // clock tower, iitkgp coordinates
 	const [error, setError] = useState("")
+	const map_inital_center_coordinates = [22.31844, 87.3061777] // clock tower, iitkgp coordinates
+	const WMS_URL =
+		process.env.NODE_ENV === 'development' ?
+			process.env.REACT_APP_GEOSERVER_DEV_API_URL : process.env.REACT_APP_GEOSERVER_PROD_API_URL
 
 	const customIcon = new Icon({
 		iconUrl: require("../images/marker.png"),
@@ -45,7 +48,8 @@ export const MapView = () => {
 					http://localhost:8080/geoserver/mtp/wms?service=WMS&version=1.1.0&request=GetMap&layers=mtp%3Aposts&bbox=87.30843353271484%2C22.322031021118164%2C87.3084487915039%2C22.322038650512695&width=768&height=384&srs=EPSG%3A4326&styles=heat_map_sld&format=application/openlayers#toggle 
 				*/}
 				<WMSTileLayer
-					url="http://localhost:8080/geoserver/mtp/wms"
+					url={WMS_URL}
+
 
 					params={{
 						layers: "mtp:posts",
