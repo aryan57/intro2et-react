@@ -8,3 +8,23 @@
 	background-color: #f2f2f2; /* Light gray background on hover */
 	cursor: pointer;
   }
+  .animated-circle {
+	width: 10px;
+	height: 10px;
+	background-color: red; /* Change the color as needed */
+	border-radius: 50%;
+	position: absolute;
+	animation: moveCircle 2s linear infinite; /* Adjust the animation duration and timing function as needed */
+  }
+  
+  @keyframes moveCircle {
+	0% {
+	  transform: translateX(0);
+	}
+	50% {
+	  transform: translateX(20px); /* Adjust the distance the circle moves */
+	}
+	100% {
+	  transform: translateX(0);
+	}
+  }

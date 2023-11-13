@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 
 import { Header } from '../Utilities/Header'
-import { Container, Table, Form, Button, Alert, FormControl, InputGroup } from 'react-bootstrap'
+import { ToggleButtonGroup, ButtonToolbar, ToggleButton, Container, Table, Form, Button, Alert, FormControl, InputGroup } from 'react-bootstrap'
 import { useAuth } from "../contexts/AuthContext"
 
 
 const MathGame = () => {
 
+  const [enableSpeak, setEnableSpeak] = useState(true);
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
@@ -20,13 +21,15 @@ const MathGame = () => {
   const { submitScore } = useAuth()
 
   const speak = (text) => {
-    const utterance = new SpeechSynthesisUtterance(text);
-    speechSynthesis.speak(utterance);
+    if (enableSpeak) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      speechSynthesis.speak(utterance);
+    }
   };
 
 
   const generateRandomNumber = () => {
-    return Math.floor(Math.random() * 10) + 1; // Adjust the range as needed
+    return Math.floor(Math.random() * 10) + 1 + levelsCleared * 5; // Adjust the range as needed
   };
 
   function shuffleArray(array) {
@@ -46,7 +49,7 @@ const MathGame = () => {
     setTargetNumber(sum);
     const originalArray = [firstNumber, secondNumber, generateRandomNumber(), generateRandomNumber()]
     setOptions(shuffleArray([...originalArray]));
-    if(sum)
+    if (sum)
       speak('Target sum is ' + sum.toString())
   };
 
@@ -69,7 +72,7 @@ const MathGame = () => {
         handleMistake();
       }
     }
-    else if(selectedNumbers.length===1){
+    else if (selectedNumbers.length === 1) {
       setSuccess("");
       setInfo("");
     }
@@ -115,25 +118,42 @@ const MathGame = () => {
 
           <div>
             {/* <h1>Math Game</h1> */}
+            
+
             <div>
               <p>Target Number: {targetNumber}</p>
               <p>Selected Numbers: {selectedNumbers.join(', ')}</p>
               <p>Levels Cleared: {levelsCleared}</p>
             </div>
             <div>
+            Options : 
               {options.map((number, index) => (
                 <Button key={index} variant="primary"
-                className="m-2" onClick={() => {
-                  handleOptionClick(number);
-                  speak(number.toString());
-                }}>
+                  className="m-2" onClick={() => {
+                    handleOptionClick(number);
+                    speak(number.toString());
+                  }}>
                   {number}
                 </Button>
               ))}
             </div>
           </div>
 
-
+          <div style={{ marginTop: 50 }}>
+              <ToggleButtonGroup type="checkbox" className="mb-2">
+                <ToggleButton
+                  id="toggle-speak"
+                  type="checkbox"
+                  variant={enableSpeak ? 'primary' : 'disabled'}
+                  value={0}
+                  checked={enableSpeak}
+                  onChange={() => setEnableSpeak(!enableSpeak)}
+                  className={`rounded-pill`}
+                >
+                  {enableSpeak ? 'Disable' : 'Enable'} Speak
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </div>
         </div>
       </Container >
     </>
