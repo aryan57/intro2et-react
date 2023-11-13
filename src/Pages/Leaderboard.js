@@ -43,7 +43,7 @@ const Leaderboard = () => {
 
 					<div>
 						{/* <h1>Leaderboard</h1> */}
-						<table striped bordered hover responsive style={{ marginTop: 10 }}>
+						<Table striped bordered hover responsive style={{ marginTop: 10 }}>
 							<thead>
 								<tr>
 									<th>ID</th>
@@ -64,7 +64,7 @@ const Leaderboard = () => {
 									</tr>
 								))}
 							</tbody>
-						</table>
+						</Table>
 					</div>
 
 
