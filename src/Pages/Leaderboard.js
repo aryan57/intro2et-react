@@ -36,7 +36,7 @@ const Leaderboard = () => {
 		<>
 			<Header />
 			<Container className="d-flex align-items-center justify-content-center">
-				<div className="w-100" style={{ maxWidth: "450px", marginTop: 50 }}>
+				<div className="w-100" style={{ maxWidth: "550px", marginTop: 50 }}>
 					<h2 className="text-center mb-4">Leaderboard</h2>
 					{error && <Alert variant="danger">{error}</Alert>}
 					{success && <Alert variant="success">{success}</Alert>}
@@ -46,17 +46,17 @@ const Leaderboard = () => {
 						<Table striped bordered hover responsive style={{ marginTop: 10 }}>
 							<thead>
 								<tr>
-									<th>ID</th>
+									<th>Rank</th>
 									<th>Name</th>
 									<th>Email</th>
 									<th>Level</th>
-									<th>Time Taken</th>
+									<th>Time Taken(sec)</th>
 								</tr>
 							</thead>
 							<tbody>
-								{leaderboardData.map((entry) => (
-									<tr key={entry.id} className="leaderboard-row">
-										<td>{entry.id}</td>
+								{leaderboardData.map((entry,index) => (
+									<tr key={index} className="leaderboard-row">
+										<td>{index+1}</td>
 										<td>{entry.name}</td>
 										<td>{entry.email}</td>
 										<td>{entry.level}</td>

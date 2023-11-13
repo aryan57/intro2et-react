@@ -10,6 +10,7 @@ const MathGame = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
+  const [info, setInfo] = useState("")
 
   const [targetNumber, setTargetNumber] = useState(0);
   const [options, setOptions] = useState([]);
@@ -17,6 +18,11 @@ const MathGame = () => {
   const [levelsCleared, setLevelsCleared] = useState(0);
   const [startTime, setStartTime] = useState(0);
   const { submitScore } = useAuth()
+
+  const speak = (text) => {
+    const utterance = new SpeechSynthesisUtterance(text);
+    speechSynthesis.speak(utterance);
+  };
 
 
   const generateRandomNumber = () => {
@@ -40,6 +46,8 @@ const MathGame = () => {
     setTargetNumber(sum);
     const originalArray = [firstNumber, secondNumber, generateRandomNumber(), generateRandomNumber()]
     setOptions(shuffleArray([...originalArray]));
+    if(sum)
+      speak('Target sum is ' + sum.toString())
   };
 
   async function handleOptionClick(number) {
@@ -61,6 +69,10 @@ const MathGame = () => {
         handleMistake();
       }
     }
+    else if(selectedNumbers.length===1){
+      setSuccess("");
+      setInfo("");
+    }
   }, [selectedNumbers]);
 
 
@@ -81,7 +93,7 @@ const MathGame = () => {
     setStartTime(Date.now());
     setLevelsCleared(0);
     setSelectedNumbers([]);
-
+    setInfo("New Game initiated!")
     generateOptions();
   };
 
@@ -99,6 +111,7 @@ const MathGame = () => {
           <h2 className="text-center mb-4">Number Ninja</h2>
           {error && <Alert variant="danger">{error}</Alert>}
           {success && <Alert variant="success">{success}</Alert>}
+          {info && <Alert>{info}</Alert>}
 
           <div>
             {/* <h1>Math Game</h1> */}
@@ -109,9 +122,13 @@ const MathGame = () => {
             </div>
             <div>
               {options.map((number, index) => (
-                <button key={index} onClick={() => handleOptionClick(number)}>
+                <Button key={index} variant="primary"
+                className="m-2" onClick={() => {
+                  handleOptionClick(number);
+                  speak(number.toString());
+                }}>
                   {number}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
