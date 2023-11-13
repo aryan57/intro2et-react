@@ -4,3 +4,7 @@
 	/* width: 100%;
 	border-radius: 2rem; */
   }
+  .leaderboard-row:hover {
+	background-color: #f2f2f2; /* Light gray background on hover */
+	cursor: pointer;
+  }

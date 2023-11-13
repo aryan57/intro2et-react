@@ -59,7 +59,7 @@ export const Signup = () => {
                   <Form.Control type="password" ref={passwordRef} required />
                 </Form.Group>
 
-                <Form.Group id="role" className="mt-2 mb-4" >
+                {/* <Form.Group id="role" className="mt-2 mb-4" >
                   <Form.Label>Role</Form.Label>
                   <ButtonGroup style={{ display: 'flex', justifyContent: 'center' }}>
                     {roles.map((role, idx) => (
@@ -77,9 +77,9 @@ export const Signup = () => {
                       </ToggleButton>
                     ))}
                   </ButtonGroup>
-                </Form.Group>
+                </Form.Group> */}
 
-                <Button disabled={loading} className="w-100" type="submit">
+                <Button disabled={loading} className="w-100 mt-4" type="submit">
                   Sign Up
                 </Button>
               </Form>

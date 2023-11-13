@@ -2,7 +2,6 @@ import React, { useState, useRef } from "react"
 import { Header } from '../Utilities/Header'
 import { Container, Table, Form, Button, Alert, FormControl, InputGroup } from 'react-bootstrap'
 import { useAuth } from "../contexts/AuthContext"
-import { useGeolocated } from "react-geolocated";
 
 export const Dashboard = () => {
 
@@ -14,13 +13,7 @@ export const Dashboard = () => {
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
   const descriptionRef = useRef()
-  const { coords, isGeolocationAvailable, isGeolocationEnabled } =
-    useGeolocated({
-      positionOptions: {
-        enableHighAccuracy: true,
-      },
-      userDecisionTimeout: 5000,
-    });
+
 
   const { createPost, uploadPostImage, predict, getNonTrainedCategories } = useAuth()
 
@@ -114,12 +107,7 @@ export const Dashboard = () => {
         longitude: 0
       };
 
-      if (isGeolocationAvailable && isGeolocationEnabled && coords) {
-        location = {
-          latitude: coords.latitude,
-          longitude: coords.longitude
-        }
-      }
+
 
       const unixTime = Math.floor(Date.now() / 1000);
 
@@ -206,6 +194,7 @@ export const Dashboard = () => {
               </tr>
             </tbody>
           </Table>
+          
         </div>
       </Container >
     </>

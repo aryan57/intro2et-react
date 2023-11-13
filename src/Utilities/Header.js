@@ -24,14 +24,13 @@ export const Header = () => {
             {error && <Alert variant="danger">{error}</Alert>}
             <Navbar expand="lg" className="bg-body-tertiary" bg="dark" data-bs-theme="dark">
                 <Container fluid>
-                    <Navbar.Brand href="/">Welcome, {authState.userEmail ? authState.userEmail : 'Unknown userEmail'}</Navbar.Brand>
+                    <Navbar.Brand href="/">Welcome, {authState.userName ? authState.userName : 'Unknown userName'}</Navbar.Brand>
                     <Navbar.Toggle aria-controls="navbarScroll" />
                     <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
                         <Nav navbarScroll>
-                            <Nav.Link href="/">Create Post</Nav.Link>
-                            <Nav.Link href="/post">Posts</Nav.Link>
-                            <Nav.Link href="/mapView">MapView</Nav.Link>
-                            <Nav.Link href="/category">Categories</Nav.Link>
+                            <Nav.Link href="/">Dashboard</Nav.Link>
+                            <Nav.Link href="/leaderboard">Leaderboard</Nav.Link>
+                
                             <Button variant="secondary" onClick={handleLogout}>Logout</Button>
                         </Nav>
                     </Navbar.Collapse>
